@@ -1,74 +1,70 @@
-This repository is a reference implementation of a **financial data ETL pipeline** based on my R – Financial project experience. It ingests transactional data from APIs and files, transforms it into a standardized schema, and loads it into **Azure Synapse** (or AWS Redshift).  
-The goal is to enable **scalable, repeatable, and testable** financial data workflows.
+TopHat — SaaS Usage Analytics
+
+📌 Overview
+This project analyzes **user interaction logs** from a SaaS platform.  
+It provides:
+- **Session funnels**
+- **User engagement heatmaps**
+- **Anomaly detection** in KPIs
+- Integration with MongoDB and PostgreSQL
 
 🏗 Architecture
 ```
-          +-------------+
-          | API / Files |
-          +------+------+ 
-                 |
-          [src/etl/ingest_api.py]
-                 |
-          +------v------+
-          | Transform   |  <- [src/etl/transform.py]
-          +------+------+ 
-                 |
-          +------v------+
-          | Synapse DW  |  <- [src/etl/load_to_synapse.py]
-          +-------------+
+   MongoDB / Postgres
+          |
+   +------v------+
+   | Data Loader |
+   +------+------+
+          |
+   +------v------+
+   | Analytics   | -- Funnels, Heatmaps, Anomaly Detection
+   +-------------+
 ```
 
 🔧 Tech Stack
 - **Python 3.10+**
-- **Azure Synapse** / AWS Redshift
-- **Azure Data Factory** (for orchestration)
-- **Pandas**, **SQLAlchemy**, **pyodbc**
-- **GitHub Actions** (CI/CD)
-- **pytest** (unit testing)
+- **MongoDB**, **PostgreSQL**
+- **Pandas**, **Statsmodels**
+- **pytest**, **GitHub Actions**
 
 📂 Project Structure
 ```
-r-financial-etl/
+tophat-usage-analytics/
 ├── src/
-│   ├── etl/
-│   │   ├── ingest_api.py
-│   │   ├── transform.py
-│   │   └── load_to_synapse.py
-│   ├── config.py
-│   └── main.py
+│   ├── data/load_mongo.py
+│   ├── analytics/funnels.py
+│   └── analytics/anomaly_detector.py
 ├── tests/
-├── infra/azure_data_factory_template.json
 ├── .env.example
 ├── requirements.txt
 └── README.md
 ```
 
 ⚙️ Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/r-financial-etl.git
-   cd r-financial-etl
-   ```
-2. Create virtual environment & install dependencies:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-3. Configure environment variables:
-   ```bash
-   cp .env.example .env
-   # Fill in API_BASE_URL, API_KEY, Azure Synapse connection string
-   ```
+```bash
+git clone https://github.com/<your-username>/tophat-usage-analytics.git
+cd tophat-usage-analytics
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
 
 🚀 Usage
-- **Dry run** (preview transformations without loading to DW):
-  ```bash
-  python src/main.py --mode dryrun
+- **Load sessions from MongoDB**:
+  ```python
+  from src.data.load_mongo import load_sessions
+  df = load_sessions(limit=500)
   ```
-- **Production run** (ETL into Synapse):
+- **Compute funnel**:
+  ```python
+  from src.analytics.funnels import compute_funnel
+  steps = ['landing', 'signup', 'purchase']
+  print(compute_funnel(df, steps))
+  ```
+- **Detect anomalies**:
   ```bash
-  python src/main.py --mode run
+  python src/analytics/anomaly_detector.py
   ```
 
 🧪 Testing
@@ -77,12 +73,11 @@ pytest -q
 ```
 
 ⚡ CI/CD
-- On every push, GitHub Actions:
-  - Runs unit tests
-  - Lints Python code
-  - (Optional) Deploys to Azure via service principal
+- Runs on push via `.github/workflows/ci.yml`
+- Executes unit tests automatically
 
 📈 Future Improvements
-- Support for multiple currency conversions
-- Automatic schema evolution detection
-- Integration with Power BI dashboards
+- Real-time anomaly alerts
+- Interactive dashboard with Plotly/Dash
+- A/B test analytics
+
