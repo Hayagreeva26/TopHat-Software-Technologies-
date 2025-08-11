@@ -1,0 +1,7 @@
+pandas==2.0.3
+pymongo==4.5.0
+sqlalchemy==2.0.16
+pytest==7.4.0
+statsmodels==0.14.0
+numpy==1.26.1
+python-dotenv==1.0.0
